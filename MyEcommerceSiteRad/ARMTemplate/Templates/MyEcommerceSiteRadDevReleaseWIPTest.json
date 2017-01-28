@@ -1,0 +1,291 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "environment": {
+      "type": "string",
+      "defaultValue": "Dev",
+      "allowedValues": [
+        "Dev",
+        "QA",
+        "Staging",
+        "Production"
+      ]
+    },
+    "releaseDefinitionReleaseEnvironment": {
+      "type": "string",
+      "minLength": 1
+    },
+    "appServicePlanName": {
+      "type": "string",
+      "minLength": 1
+    },
+    "appServicePlanSkuName": {
+      "type": "string",
+      "defaultValue": "F1",
+      "allowedValues": [
+        "F1",
+        "D1",
+        "B1",
+        "B2",
+        "B3",
+        "S1",
+        "S2",
+        "S3",
+        "P1",
+        "P2",
+        "P3",
+        "P4"
+      ],
+      "metadata": {
+        "description": "Describes plan's pricing tier and instance size. Check details at https://azure.microsoft.com/en-us/pricing/details/app-service/"
+      }
+    },
+    "appServicePlanSkuCapacity": {
+      "type": "int",
+      "defaultValue": 1,
+      "minValue": 1,
+      "metadata": {
+        "description": "Describes plan's instance count"
+      }
+    },
+    "appServicePlanWorkerSize": {
+      "type": "string",
+      "defaultValue": "0",
+      "allowedValues": [
+        "0",
+        "1",
+        "2"
+      ]
+    },
+    "webAppName": {
+      "type": "string"
+    },
+    "webAppRemoteDebuggingEnabled": {
+      "type": "bool",
+      "defaultValue": false
+    },
+    "webAppSlotName": {
+      "type": "string",
+      "defaultValue": "WebAppEmptySlot"
+    },
+    "webAppSlotConfigNamesAppSettingNames": {
+      "type": "array",
+      "defaultValue": [
+        "ApplicationInsights:InstrumentationKey",
+        "environment",
+        "releaseDefinitionReleaseEnvironment"
+      ]
+    },
+    "webAppSlotConfigNamesConnectionStringNames": {
+      "type": "array",
+      "defaultValue": [ "DefaultConnection" ]
+    },
+    "includeWebAppSlot": {
+      "type": "string",
+      "defaultValue": "no",
+      "allowedValues": [
+        "yes",
+        "no"
+      ]
+    },
+    "sqlServerDatabaseName": {
+      "type": "string"
+    },
+    "sqlServerAdministratorLogin": {
+      "type": "string"
+    },
+    "sqlServerAdministratorLoginPassword": {
+      "type": "securestring"
+    },
+    "sqlServerEdition": {
+      "type": "string",
+      "defaultValue": "Basic",
+      "allowedValues": [
+        "Basic",
+        "Standard",
+        "Premium"
+      ]
+    },
+    "sqlServerCollation": {
+      "type": "string",
+      "defaultValue": "SQL_Latin1_General_CP1_CI_AS"
+    },
+    "sqlServerMaxSizeBytes": {
+      "type": "string",
+      "defaultValue": "1073741824"
+    },
+    "sqlServerRequestedServiceObjectiveName": {
+      "type": "string",
+      "defaultValue": "Basic",
+      "allowedValues": [
+        "Basic",
+        "S0",
+        "S1",
+        "S2",
+        "P1",
+        "P2",
+        "P3"
+      ],
+      "metadata": {
+        "description": "Describes the performance level for Edition"
+      }
+    },
+    "devstorageType": {
+      "type": "string",
+      "defaultValue": "Standard_LRS",
+      "allowedValues": [
+        "Standard_LRS",
+        "Standard_ZRS",
+        "Standard_GRS",
+        "Standard_RAGRS",
+        "Premium_LRS"
+      ]
+    },
+    "artifactsLocation": {
+      "type": "string",
+      "defaultValue": "fake_artifactsLocation_from_Template"
+    },
+    "artifactsLocationSasToken": {
+      "type": "securestring",
+      "defaultValue": "fake_artifactsLocationSasToken_from_Template"
+    }
+  },
+  "variables": {
+    "sqlServerName": "[concat('sqlserver', uniqueString(resourceGroup().id))]",
+    "devStorageName": "[concat('devstorage', uniqueString(resourceGroup().id))]",
+    "armTemplateLocation": "[parameters('artifactsLocation')]",
+    "webAppSlotProvisioningTemplate": {
+      "yes": "[uri(variables('armTemplateLocation'), 'nestedtemplates/WebAppSlot.json')]",
+      "no": "[uri(variables('armTemplateLocation'), 'nestedtemplates/WebAppSlotEmpty.json')]"
+    },
+    "webAppSlotSettingsProvisioningTemplate": {
+      "yes": "[uri(variables('armTemplateLocation'), 'nestedtemplates/WebAppSlotSettings.json')]",
+      "no": "[uri(variables('armTemplateLocation'), 'nestedtemplates/WebAppSlotSettingsEmpty.json')]"
+    }
+  },
+  "resources": [
+  ],
+  "outputs": {
+    "sqlServerName": {
+      "value": "[variables('sqlServerName')]",
+      "type": "string"
+    },
+    "devStorageName": {
+      "value": "[variables('devStorageName')]",
+      "type": "string"
+    },
+    "armTemplateLocation": {
+      "value": "[variables('armTemplateLocation')]",
+      "type": "string"
+    },
+    "includeWebAppSlot": {
+      "value": "[parameters('includeWebAppSlot')]",
+      "type": "string"
+    },
+    "webAppSlotProvisioningTemplate": {
+      "value": "[concat(variables('webAppSlotProvisioningTemplate')[parameters('includeWebAppSlot')], parameters('artifactsLocationSasToken'))]",
+      "type": "string"
+    },
+    "webAppSlotSettingsProvisioningTemplate": {
+      "value": "[concat(variables('webAppSlotSettingsProvisioningTemplate')[parameters('includeWebAppSlot')], parameters('artifactsLocationSasToken'))]",
+      "type": "string"
+    },
+    "resourceGroupLocation": {
+      "value": "[resourceGroup().location]",
+      "type": "string"
+    },
+    "webAppUrl": {
+      "type": "string",
+      "value": "[concat('http://', parameters('webappname'), '.azurewebsites.net')]"
+    },
+    "webAppSlotUrl": {
+      "type": "string",
+      "value": "[concat('http://', parameters('webappname'), '-', parameters('webAppSlotName'), '.azurewebsites.net')]"
+    },
+    "environment": {
+      "value": "[parameters('environment')]",
+      "type": "string"
+    },
+    "releaseDefinitionReleaseEnvironment": {
+      "value": "[parameters('releaseDefinitionReleaseEnvironment')]",
+      "type": "string"
+    },
+    "appServicePlanName": {
+      "value": "[parameters('appServicePlanName')]",
+      "type": "string"
+    },
+    "appServicePlanSkuName": {
+      "value": "[parameters('appServicePlanSkuName')]",
+      "type": "string"
+    },
+    "appServicePlanSkuCapacity": {
+      "value": "[parameters('appServicePlanSkuCapacity')]",
+      "type": "int"
+    },
+    "appServicePlanWorkerSize": {
+      "value": "[parameters('appServicePlanWorkerSize')]",
+      "type": "string"
+    },
+    "webAppName": {
+      "value": "[parameters('webAppName')]",
+      "type": "string"
+    },
+    "webAppRemoteDebuggingEnabled": {
+      "value": "[parameters('webAppRemoteDebuggingEnabled')]",
+      "type": "bool"
+    },
+    "webAppSlotName": {
+      "value": "[parameters('webAppSlotName')]",
+      "type": "string"
+    },
+    "webAppSlotConfigNamesAppSettingNames": {
+      "value": "[parameters('webAppSlotConfigNamesAppSettingNames')]",
+      "type": "array"
+    },
+    "webAppSlotConfigNamesConnectionStringNames": {
+      "value": "[parameters('webAppSlotConfigNamesConnectionStringNames')]",
+      "type": "array"
+    },
+    "sqlServerDatabaseName": {
+      "value": "[parameters('sqlServerDatabaseName')]",
+      "type": "string"
+    },
+    "sqlServerAdministratorLogin": {
+      "value": "[parameters('sqlServerAdministratorLogin')]",
+      "type": "string"
+    },
+    "sqlServerAdministratorLoginPassword": {
+      "value": "[parameters('sqlServerAdministratorLoginPassword')]",
+      "type": "string"
+    },
+    "sqlServerEdition": {
+      "value": "[parameters('sqlServerEdition')]",
+      "type": "string"
+    },
+    "sqlServerCollation": {
+      "value": "[parameters('sqlServerCollation')]",
+      "type": "string"
+    },
+    "sqlServerMaxSizeBytes": {
+      "value": "[parameters('sqlServerMaxSizeBytes')]",
+      "type": "string"
+    },
+    "sqlServerRequestedServiceObjectiveName": {
+      "value": "[parameters('sqlServerRequestedServiceObjectiveName')]",
+      "type": "string"
+    },
+    "devstorageType": {
+      "value": "[parameters('devstorageType')]",
+      "type": "string"
+    },
+    "artifactsLocation": {
+      "value": "[parameters('artifactsLocation')]",
+      "type": "string"
+    },
+    "artifactsLocationSasToken": {
+      "value": "[parameters('artifactsLocationSasToken')]",
+      "type": "string"
+    }
+  }
+}

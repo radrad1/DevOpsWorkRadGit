@@ -1,0 +1,126 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "webAppName": {
+      "type": "string",
+      "minLength": 1
+    },
+    "webAppSlotName": {
+      "type": "string",
+      "defaultValue": "WebAppEmptySlot"
+    },
+    "includeWebAppSlot": {
+      "type": "string",
+      "defaultValue": "no",
+      "allowedValues": [
+        "yes",
+        "no"
+      ]
+    }
+  },
+  "variables": {
+    "resourceUriSwitch": {
+      "no": "[resourceId('Microsoft.Web/sites', parameters('webAppName'))]",
+      "yes": "[resourceId('Microsoft.Web/sites/slots', parameters('webAppName'), parameters('webAppSlotName'))]"
+    },
+    "resourceUri": "[variables('resourceUriSwitch')[parameters('includeWebAppSlot')]]",
+    "applicationIdSwitch": {
+      "no": "[concat(parameters('webAppName'))]",
+      "yes": "[concat(parameters('webAppName'), '-', toLower(parameters('webAppSlotName')))]"
+    },
+    "applicationId": "[variables('applicationIdSwitch')[parameters('includeWebAppSlot')]]",
+    "appInsightsAlertName": "[variables('applicationId')]",
+    "appInsightsComponentName": "[variables('applicationId')]",
+    "appServiceMetricNames": ["CpuTime", "Requests", "BytesReceived", "BytesSent", "Http2xx", "Http3xx", "Http401", "Http403", "Http404", "Http406", "Http4xx", "Http5xx", "MemoryWorkingSet", "AverageMemoryWorkingSet", "AverageResponseTime"]
+  },
+  "resources": [
+    {
+      "apiVersion": "2014-04-01",
+      "name": "[concat('ServerErrors ', variables('appInsightsAlertName'))]",
+      "type": "Microsoft.Insights/alertrules",
+      "location": "[resourceGroup().location]",
+      "dependsOn": [
+      ],
+      "tags": {
+        "[concat('hidden-link:', variables('resourceUri'))]": "Resource",
+        "displayName": "ServerErrorsAlertRule"
+      },
+      "properties": {
+        "name": "[concat('ServerErrors ', variables('appInsightsAlertName'))]",
+        "description": "[concat(variables('appInsightsAlertName'), ' has some server errors, status code 5xx.')]",
+        "isEnabled": false,
+        "condition": {
+          "odata.type": "Microsoft.Azure.Management.Insights.Models.ThresholdRuleCondition",
+          "dataSource": {
+            "odata.type": "Microsoft.Azure.Management.Insights.Models.RuleMetricDataSource",
+            "resourceUri": "[variables('resourceUri')]",
+            "metricName": "Http5xx"
+          },
+          "operator": "GreaterThan",
+          "threshold": 0.0,
+          "windowSize": "PT5M"
+        },
+        "action": {
+          "odata.type": "Microsoft.Azure.Management.Insights.Models.RuleEmailAction",
+          "sendToServiceOwners": true,
+          "customEmails": []
+        }
+      }
+    },
+    {
+      "apiVersion": "2014-04-01",
+      "name": "[concat('ForbiddenRequests ', variables('appInsightsAlertName'))]",
+      "type": "Microsoft.Insights/alertrules",
+      "location": "[resourceGroup().location]",
+      "dependsOn": [
+      ],
+      "tags": {
+        "[concat('hidden-link:', variables('resourceUri'))]": "Resource",
+        "displayName": "ForbiddenRequestsAlertRule"
+      },
+      "properties": {
+        "name": "[concat('ForbiddenRequests ', variables('appInsightsAlertName'))]",
+        "description": "[concat(variables('appInsightsAlertName'), ' has some requests that are forbidden, status code 403.')]",
+        "isEnabled": false,
+        "condition": {
+          "odata.type": "Microsoft.Azure.Management.Insights.Models.ThresholdRuleCondition",
+          "dataSource": {
+            "odata.type": "Microsoft.Azure.Management.Insights.Models.RuleMetricDataSource",
+            "resourceUri": "[variables('resourceUri')]",
+            "metricName": "Http403"
+          },
+          "operator": "GreaterThan",
+          "threshold": 0,
+          "windowSize": "PT5M"
+        },
+        "action": {
+          "odata.type": "Microsoft.Azure.Management.Insights.Models.RuleEmailAction",
+          "sendToServiceOwners": true,
+          "customEmails": []
+        }
+      }
+    },
+    {
+      "apiVersion": "2014-04-01",
+      "name": "[variables('appInsightsComponentName')]",
+      "type": "Microsoft.Insights/components",
+      "location": "East US",
+      "dependsOn": [
+      ],
+      "tags": {
+        "[concat('hidden-link:', variables('resourceUri'))]": "Resource",
+        "displayName": "AppInsightsComponent"
+      },
+      "properties": {
+        "ApplicationId": "[variables('ApplicationId')]"
+      }
+    }
+  ],
+  "outputs": {
+    "ApplicationInsightsInstrumentationKey": {
+      "value": "[reference(concat('Microsoft.Insights/components/', variables('appInsightsComponentName')), '2015-05-01').InstrumentationKey]",
+      "type": "object"
+    }
+  }
+}

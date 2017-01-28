@@ -1,0 +1,16 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "appServicePlanName": {
+      "type": "string",
+      "minLength": 1
+    }
+  },
+  "variables": {
+    "appServiceMetricNames": ["CpuPercentage", "MemoryPercentage", "DiskQueueLength", "HttpQueueLength", "BytesReceived", "BytesSent"]
+  },
+  "resources": [
+  ],
+  "outputs": {}
+}

@@ -1,0 +1,24 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+
+  },
+  "variables": {
+    "siteName": "myuniquename"
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Web/sites/providers/links",
+      "apiVersion": "2015-01-01",
+      "name": "[concat(variables('siteName'),'/Microsoft.Resources/SiteToStorage')]",
+      "dependsOn": [ "[variables('siteName')]" ],
+      "properties": {
+        "targetId": "[resourceId('Microsoft.Storage/storageAccounts','storagecontoso')]",
+        "notes": "This web site uses the storage account to store user information."
+      }
+    }
+  ],
+  "outputs": {
+  }
+}

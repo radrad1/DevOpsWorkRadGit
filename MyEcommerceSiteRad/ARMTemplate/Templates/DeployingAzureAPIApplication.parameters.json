@@ -1,0 +1,14 @@
+﻿{
+  "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "hostingPlanName": { "value": "[Service Plan Name]" },
+    "skuName": { "value": "[Resource Level]" },
+    "skuCapacity": { "value": [ "Capacity" ] },
+    "resourceLocation": { "value": "[Resource Location]" },
+    "storageName": { "value": "[Storage Name]" },
+    "storageType": { "value": "[Storage Type]" },
+    "apiName": { "value": "[API Application Name]" },
+    "insightsName": { "value": "[Insights Name]" }
+  }
+}

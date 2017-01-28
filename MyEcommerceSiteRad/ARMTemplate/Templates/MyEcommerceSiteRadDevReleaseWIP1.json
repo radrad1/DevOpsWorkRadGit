@@ -1,0 +1,280 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "environment": {
+      "type": "string",
+      "defaultValue": "Dev",
+      "allowedValues": [
+        "Dev",
+        "QA",
+        "Staging",
+        "Production"
+      ]
+    },
+    "releaseDefinitionReleaseEnvironment": {
+      "type": "string",
+      "minLength": 1
+    },
+    "appServicePlanName": {
+      "type": "string",
+      "minLength": 1
+    },
+    "appServicePlanSkuName": {
+      "type": "string",
+      "defaultValue": "F1",
+      "allowedValues": [
+        "F1",
+        "D1",
+        "B1",
+        "B2",
+        "B3",
+        "S1",
+        "S2",
+        "S3",
+        "P1",
+        "P2",
+        "P3",
+        "P4"
+      ],
+      "metadata": {
+        "description": "Describes plan's pricing tier and instance size. Check details at https://azure.microsoft.com/en-us/pricing/details/app-service/"
+      }
+    },
+    "appServicePlanSkuCapacity": {
+      "type": "int",
+      "defaultValue": 1,
+      "minValue": 1,
+      "metadata": {
+        "description": "Describes plan's instance count"
+      }
+    },
+    "appServicePlanWorkerSize": {
+      "type": "string",
+      "defaultValue": "0",
+      "allowedValues": [
+        "0",
+        "1",
+        "2"
+      ]
+    },
+    "webAppName": {
+      "type": "string"
+    },
+    "webAppRemoteDebuggingEnabled": {
+      "type": "bool",
+      "defaultValue": false
+    },
+    "webAppSlotName": {
+      "type": "string",
+      "defaultValue": "WebAppEmptySlot"
+    },
+    "webAppSlotConfigNamesAppSettingNames": {
+      "type": "array",
+      "defaultValue": [
+        "ApplicationInsights:InstrumentationKey",
+        "environment",
+        "releaseDefinitionReleaseEnvironment"
+      ]
+    },
+    "webAppSlotConfigNamesConnectionStringNames": {
+      "type": "array",
+      "defaultValue": [ "DefaultConnection" ]
+    },
+    "includeWebAppSlot": {
+      "type": "string",
+      "defaultValue": "no",
+      "allowedValues": [
+        "yes",
+        "no"
+      ],
+      "metadata": {
+        "description": "The flag allowing to enable or disable provisioning of the Web App Slot and its Settings"
+      }
+    },
+    "sqlServerDatabaseName": {
+      "type": "string"
+    },
+    "sqlServerAdministratorLogin": {
+      "type": "string"
+    },
+    "sqlServerAdministratorLoginPassword": {
+      "type": "securestring",
+      "defaultValue": "fake_password"
+    },
+    "sqlServerEdition": {
+      "type": "string",
+      "defaultValue": "Basic",
+      "allowedValues": [
+        "Basic",
+        "Standard",
+        "Premium"
+      ]
+    },
+    "sqlServerCollation": {
+      "type": "string",
+      "defaultValue": "SQL_Latin1_General_CP1_CI_AS"
+    },
+    "sqlServerMaxSizeBytes": {
+      "type": "string",
+      "defaultValue": "1073741824"
+    },
+    "sqlServerRequestedServiceObjectiveName": {
+      "type": "string",
+      "defaultValue": "Basic",
+      "allowedValues": [
+        "Basic",
+        "S0",
+        "S1",
+        "S2",
+        "P1",
+        "P2",
+        "P3"
+      ],
+      "metadata": {
+        "description": "Describes the performance level for Edition"
+      }
+    },
+    "devstorageType": {
+      "type": "string",
+      "defaultValue": "Standard_LRS",
+      "allowedValues": [
+        "Standard_LRS",
+        "Standard_ZRS",
+        "Standard_GRS",
+        "Standard_RAGRS",
+        "Premium_LRS"
+      ]
+    },
+    "artifactsLocation": {
+      "type": "string",
+      "defaultValue": "fake_artifactsLocation_from_Template"
+    },
+    "artifactsLocationSasToken": {
+      "type": "securestring",
+      "defaultValue": "fake_artifactsLocationSasToken_from_Template"
+    }
+  },
+  "variables": {
+    "sqlServerName": "[concat('sqlserver', uniqueString(resourceGroup().id))]",
+    "devStorageName": "[concat('devstorage', uniqueString(resourceGroup().id))]",
+    "armTemplateLocation": "[parameters('artifactsLocation')]",
+    "webAppSlotTemplateSwitch": {
+      "yes": "[uri(variables('armTemplateLocation'), 'nestedtemplates/WebAppSlot.json')]",
+      "no": "[uri(variables('armTemplateLocation'), 'nestedtemplates/WebAppSlotEmpty.json')]"
+    },
+    "webAppSlotSettingsTemplateSwitch": {
+      "yes": "[uri(variables('armTemplateLocation'), 'nestedtemplates/WebAppSlotSettings.json')]",
+      "no": "[uri(variables('armTemplateLocation'), 'nestedtemplates/WebAppSlotSettingsEmpty.json')]"
+    },
+    "sqlDatabaseTemplate": "[concat(uri(variables('armTemplateLocation'), 'nestedtemplates/SqlDatabase.json'), parameters('artifactsLocationSasToken'))]",
+    "applicationInsightsTemplate": "[concat(uri(variables('armTemplateLocation'), 'nestedtemplates/ApplicationInsights.json'), parameters('artifactsLocationSasToken'))]",
+    "appServicePlanTemplate": "[concat(uri(variables('armTemplateLocation'), 'nestedtemplates/AppServicePlan.json'), parameters('artifactsLocationSasToken'))]",
+    "webAppTemplate": "[concat(uri(variables('armTemplateLocation'), 'nestedtemplates/WebApp.json'), parameters('artifactsLocationSasToken'))]",
+    "webAppSettingsTemplate": "[concat(uri(variables('armTemplateLocation'), 'nestedtemplates/WebAppSettings.json'), parameters('artifactsLocationSasToken'))]",
+    "webAppSlotTemplate": "[concat(variables('webAppSlotTemplateSwitch')[parameters('includeWebAppSlot')], parameters('artifactsLocationSasToken'))]",
+    "webAppSlotSettingsTemplate": "[concat(variables('webAppSlotSettingsTemplateSwitch')[parameters('includeWebAppSlot')], parameters('artifactsLocationSasToken'))]",
+    "apiVersions": {
+      "Compute": {
+        "VirtualMachines": "2015-06-15",
+        "Extensions": "2015-06-15"
+      },
+      "Storage": {
+        "storageAccounts": "2015-06-15"
+      },
+      "network": {
+        "virtualnetworks": "2015-06-15",
+        "publicIPaddress": "2015-06-15",
+        "networkinterface": "2015-06-15"
+      }
+    }
+  },
+  "resources": [
+    {
+      "name": "SqlDatabaseDeploymentTemplate",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2016-09-01",
+      "dependsOn": [],
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[variables('sqlDatabaseTemplate')]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "sqlServerName": { "value": "[variables('sqlServerName')]" },
+          "databaseName": { "value": "[parameters('sqlServerDatabaseName')]" },
+          "administratorLogin": { "value": "[parameters('sqlServerAdministratorLogin')]" },
+          "administratorLoginPassword": { "value": "[parameters('sqlServerAdministratorLoginPassword')]" },
+          "edition": { "value": "[parameters('sqlServerEdition')]" },
+          "collation": { "value": "[parameters('sqlServerCollation')]" },
+          "maxSizeBytes": { "value": "[parameters('sqlServerMaxSizeBytes')]" },
+          "requestedServiceObjectiveName": { "value": "[parameters('sqlServerRequestedServiceObjectiveName')]" }
+        },
+        "debugSetting": { "detailLevel": "requestContent, responseContent" }
+      }
+    },
+    {
+      "name": "AppServicePlanDeploymentTemplate",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2016-09-01",
+      "dependsOn": [],
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[variables('appServicePlanTemplate')]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "appServicePlanName": { "value": "[parameters('appServicePlanName')]" },
+          "appServicePlanSkuName": { "value": "[parameters('appServicePlanSkuName')]" },
+          "appServicePlanSkuCapacity": { "value": "[parameters('appServicePlanSkuCapacity')]" },
+          "appServicePlanWorkerSize": { "value": "[parameters('appServicePlanWorkerSize')]" }
+        },
+        "debugSetting": { "detailLevel": "requestContent, responseContent" }
+      }
+    },
+    {
+      "name": "WebAppDeploymentTemplate",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2016-09-01",
+      "dependsOn": [
+        "[concat('Microsoft.Resources/deployments/', 'AppServicePlanDeploymentTemplate')]"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[variables('webAppTemplate')]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "webAppName": { "value": "[parameters('webAppName')]" },
+          "appServicePlanName": { "value": "[parameters('appServicePlanName')]" }
+        },
+        "debugSetting": { "detailLevel": "requestContent, responseContent" }
+      }
+    },
+    {
+      "name": "ApplicationInsightsTemplate",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2016-09-01",
+      "dependsOn": [
+        "[concat('Microsoft.Resources/deployments/', 'WebAppDeploymentTemplate')]"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[variables('applicationInsightsTemplate')]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "webAppName": { "value": "[parameters('webAppName')]" },
+          "appServicePlanName": { "value": "[parameters('appServicePlanName')]" }
+        },
+        "debugSetting": { "detailLevel": "requestContent, responseContent" }
+      }
+    }
+  ],
+  "outputs": {
+ }
+}

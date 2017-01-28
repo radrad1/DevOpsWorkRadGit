@@ -1,0 +1,53 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "webAppName": {
+      "type": "string",
+      "minLength": 1
+    },
+    "appServicePlanName": {
+      "type": "string",
+      "minLength": 1
+    },
+    "slotName": {
+      "type": "string",
+      "minLength": 1
+    },
+    "appSettingNames": {
+      "type": "array"
+    },
+    "connectionStringNames": {
+      "type": "array"
+    }
+  },
+  "variables": {},
+  "resources": [
+    {
+      "apiVersion": "2015-08-01",
+      "name": "[concat(parameters('webAppName'), '/', parameters('slotName'))]",
+      "type": "Microsoft.Web/sites/slots",
+      "location": "[resourceGroup().location]",
+      "dependsOn": [],
+      "tags": {
+        "[concat('hidden-related:', resourceGroup().id, '/providers/Microsoft.Web/serverfarms/', parameters('appServicePlanName'))]": "Resource",
+        "displayName": "Website"
+      },
+      "properties": {
+        "serverFarmId": "[resourceId(resourceGroup().name, 'Microsoft.Web/serverfarms', parameters('appServicePlanName'))]"
+      }
+    },
+    {
+      "apiVersion": "2015-08-01",
+      "name": "[concat(parameters('webAppName'), '/', 'slotconfignames')]",
+      "type": "Microsoft.Web/sites/config",
+      "dependsOn": [],
+      "properties": {
+        "appSettingNames": "[parameters('appSettingNames')]",
+        "connectionStringNames": "[parameters('connectionStringNames')]"
+      }
+    }
+  ],
+  "outputs": {
+  }
+}

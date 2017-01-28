@@ -1,0 +1,32 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "webAppName": {
+      "type": "string",
+      "minLength": 1
+    },
+    "webAppSlotName": {
+      "type": "string",
+      "defaultValue": "WebAppEmptySlot"
+    },
+    "includeWebAppSlot": {
+      "type": "string",
+      "defaultValue": "no",
+      "allowedValues": [
+        "yes",
+        "no"
+      ]
+    }
+  },
+  "variables": {
+  },
+  "resources": [
+  ],
+  "outputs": {
+    "ApplicationInsightsInstrumentationKey": {
+      "value": "",
+      "type": "string"
+    }
+  }
+}

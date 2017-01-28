@@ -1,0 +1,46 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "OtherDeploym??entName": {
+      "type": "string",
+      "minLength": 1
+    },
+    "appServicePlanSkuName": {
+      "type": "string",
+      "defaultValue": "[reference(resourceId('OtherResourceGroup','Microsoft.Resourc??es/deployments', parameters('OtherDeploym??entName')),'2015-01-??01').outputs]"
+    }
+  },
+  "variables": {
+    "teststorageApiVersion": "[variables('apiVersions').storage.storageAccounts]",
+    "testsubscriptionId": "a4e00906-a9df-4dea-937b-674d7260c4ee",
+    "testserverFarmIdMidForm": "leftbracket_resourceId('Microsoft.Web/serverfarms/', parameters('appServicePlanName')_rightbracket",
+    "testserverFarmIdShort": "[parameters('appServicePlanName')]",
+    "testdependsOnLongForm": [ "leftbracket_resourceId('Microsoft.Web/serverfarms', parameters('appServicePlanName'))_rightbracket" ],
+    "testdependsOnMidForm": [ "[concat('Microsoft.Web/serverfarms/', parameters('appServicePlanName'))]" ],
+    "testdependsOnShortForm": [ "[parameters('appServicePlanName')]" ],
+    "testiKey": "leftbracket_reference(concat('Microsoft.Insights/components/', variables('webSiteName'), '-Staging'), '2015-05-01').InstrumentationKey_rightbracket_fromF:\\websites\\Azure\\Arm\\AppServiceWorkshop\\SpeakerResources\\3-Monitoring\\WebSite.json",
+    "StorageConnectionString": "[concat('DefaultEndpointsProtocol=https;AccountName=',variables('storageAccountName'),';AccountKey=',listKeys(variables('storageAccountName'),'2016-01-01').keys[0].value)]",
+    "StorageConnectionStringSourceURL": "https://msftplayground.com/2016/06/starting-azure-resource-templates/",
+    "InstrumentationKey": "[reference(concat('Microsoft.Insights/components/', parameters('insightsName'))).InstrumentationKey]",
+    "appName": {
+      "type": "string",
+      "metadata": {
+        "description": "Enter the application name."
+      }
+    },
+    "priceCode": {
+      "type": "int",
+      "defaultValue": 1,
+      "allowedValues": [ 1, 2 ],
+      "metadata": { "description": "1 = Basic, 2 = Enterprise" }
+    },
+    "priceArray": [ "Basic", "Application Insights Enterprise" ],
+    "pricePlan": "[take(variables('priceArray'),variables('priceCode'))]",   Returns an array with the specified number of elements from the start of the array.
+    "billingplan": "[concat(variables('appName'),'/', variables('pricePlan')[0])]"
+
+  },
+  "resources": [
+  ],
+  "outputs": {}
+}

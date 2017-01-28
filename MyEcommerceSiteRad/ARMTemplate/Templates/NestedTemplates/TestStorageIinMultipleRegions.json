@@ -1,0 +1,37 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "webAppName": {
+      "type": "string",
+      "minLength": 1
+    },
+    "appServicePlanName": {
+      "type": "string",
+      "minLength": 1
+    },
+    "appServicePlanName": {
+      "type": "string",
+      "minLength": 1,
+      "defaultValue": "https://blogs.msdn.microsoft.com/kaevans/2015/11/22/creating-arm-templates-with-azure-resource-explorer/"
+    }
+  },
+  "variables": {
+    "appInsightsName": "[parameters('webAppName')]"
+  },
+  "resources": [
+    {
+      "apiVersion": "2015-08-01",
+      "name": "appsettings",
+      "type": "config",
+      "dependsOn": [
+        "[resourceId('Microsoft.Web/sites', concat(variables('WebSiteName'),copyIndex()))]"
+      ],
+      "properties": {
+        "foo": "bar",
+        "storageConnectionString": "[concat('DefaultEndpointsProtocol=https;AccountName=',toLower(concat(variables('StorageName'), copyIndex())),';AccountKey=',listKeys(resourceId('Microsoft.Storage/storageAccounts',concat(variables('StorageName'), copyIndex())),'2015-05-01-preview').key1)]"
+      }
+    }
+  ],
+  "outputs": {}
+}

@@ -1,0 +1,49 @@
+﻿{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "name": {
+      "type": "string"
+    },
+    "accountType": {
+      "type": "string"
+    },
+    "location": {
+      "type": "string"
+    },
+    "encryptionEnabled": {
+      "defaultValue": false,
+      "type": "bool"
+    },
+    "accessTier": {
+      "allowedValues": [
+        "Cool",
+        "Hot"
+      ],
+      "type": "string"
+    }
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Storage/storageAccounts",
+      "sku": {
+        "name": "[parameters('accountType')]"
+      },
+      "kind": "BlobStorage",
+      "name": "[parameters('name')]",
+      "apiVersion": "2016-01-01",
+      "location": "[parameters('location')]",
+      "properties": {
+        "accessTier": "[parameters('accessTier')]",
+        "encryption": {
+          "services": {
+            "blob": {
+              "enabled": "[parameters('encryptionEnabled')]"
+            }
+          },
+          "keySource": "Microsoft.Storage"
+        }
+      }
+    }
+  ]
+}

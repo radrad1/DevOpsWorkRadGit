@@ -1,0 +1,33 @@
+{
+  "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "osDisk": {
+      "name": "osdisk",
+      "vhd": {
+        "uri": "[concat(reference(resourceId(parameters('existingResourceGroup'), 'Microsoft.Storage/storageAccounts/', parameters('existingStorageAccountName')), '2016-01-01').primaryEndpoints.blob,  variables('vmStorageAccountContainerName'), '/', variables('OSDiskName'),'.vhd')]"
+      }
+    },
+
+    https://opbuildstorageprod.blob.core.windows.net/output-pdf-files/en-us/Azure.azure-documents/live/azure-resource-manager.pdf
+    "The following example references a storage account that is not deployed in this template, but exists within the
+same resource group as the resources being deployed."
+
+    "ExistingStorage": {
+      "type": "string",
+      "defaultValue": "[reference(concat('Microsoft.Storage/storageAccounts/', parameters('storageAccountName')),'2016-01-01')]"
+    },
+    
+       
+       "templateSource": {
+      "type": "string",
+      "defaultValue": "https://docs.microsoft.com/en-us/azure/azure-resource-manager/resource-manager-template-best-practices"
+    }
+  },
+  "variables": {
+  },
+  "resources": [
+  ],
+  "outputs": {
+  }
+}

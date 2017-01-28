@@ -1,0 +1,80 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|AnyCPU">
+      <Configuration>Debug</Configuration>
+      <Platform>AnyCPU</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|AnyCPU">
+      <Configuration>Release</Configuration>
+      <Platform>AnyCPU</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>45e003d0-c2f8-4c3d-93de-35d7438847d8</ProjectGuid>
+  </PropertyGroup>
+  <PropertyGroup>
+    <TargetFrameworkIdentifier>Deployment</TargetFrameworkIdentifier>
+    <TargetFrameworkVersion>1.0</TargetFrameworkVersion>
+    <PrepareForBuildDependsOn>
+    </PrepareForBuildDependsOn>
+  </PropertyGroup>
+  <Import Condition=" Exists('Deployment.targets') " Project="Deployment.targets" />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.Common.targets" />
+  <!-- vertag<:>start tokens<:>maj.min -->
+  <Import Condition=" Exists('$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Deployment\1.1\DeploymentProject.targets') " Project="$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Deployment\1.1\DeploymentProject.targets" />
+  <!-- vertag<:>end -->
+  <ItemGroup>
+    <Content Include="Templates\NestedTemplates\ApplicationInsightsAppServiceSettingsEmpty.json" />
+    <Content Include="Templates\NestedTemplates\ApplicationInsightsAppServiceSettings.json" />
+    <Content Include="Templates\NestedTemplates\ApplicationInsightsBak.json" />
+    <Content Include="Templates\NestedTemplates\ApplicationInsightsWebAppSettingsEmpty.json" />
+    <Content Include="Templates\NestedTemplates\TestAccessOutputOfAnotherResourcegroupDeployment .json" />
+    <Content Include="Templates\NestedTemplates\Testreferenceanexistingstorageaccountnadifferentresourcegroup.json" />
+    <Content Include="Templates\NestedTemplates\TestAppServiceMultiTenant.json" />
+    <Content Include="Templates\NestedTemplates\TestLinkBetweenWebAppAndStorageAccount.json" />
+    <Content Include="Templates\NestedTemplates\TestARMtemplateoutputsforAzureSQLDatabase.json" />
+    <Content Include="Templates\NestedTemplates\TestStorageIinMultipleRegions.json" />
+    <Content Include="Templates\NestedTemplates\AppServicePlan.json" />
+    <Content Include="Templates\NestedTemplates\SqlDatabase.json" />
+    <Content Include="Templates\NestedTemplates\WebAppSlotSettingsEmpty.json" />
+    <Content Include="Templates\NestedTemplates\WebAppSlotEmpty.json" />
+    <Content Include="Templates\NestedTemplates\WebApp.json" />
+    <Content Include="Templates\NestedTemplates\ApplicationInsightsWebAppSettings.json" />
+    <Content Include="Templates\NestedTemplates\WebAppSettings.json" />
+    <Content Include="Templates\NestedTemplates\WebAppSlotSettings.json" />
+    <Content Include="Templates\NestedTemplates\WebAppWithAssociatedPlan.json" />
+    <Content Include="Templates\NestedTemplates\WebAppSlot.json" />
+    <Content Include="Templates\NestedTemplates\StagingSlot.json" />
+    <Content Include="Templates\NestedTemplates\StagingSlot.parameters.json" />
+    <None Include="Deployment.targets">
+      <Visible>False</Visible>
+    </None>
+    <None Include="Scripts\Deploy-AzureResourceGroup.ps1" />
+    <None Include="Scripts\DeployingAzureAPIApplication.ps1" />
+    <None Include="Scripts\SwapSlots.ps1" />
+    <None Include="Templates\DeployingAzureAPIApplication - Copy.json" />
+    <None Include="Templates\DeployingAzureAPIApplication.parameters.json" />
+    <None Include="Templates\DeployingAzureAPIApplication.json" />
+    <None Include="Templates\emptyazuredeploytemplate.json" />
+    <None Include="Templates\MyEcommerceSiteRadDev.json" />
+    <None Include="Templates\MyEcommerceSiteRadDev.parameters.json" />
+    <None Include="Templates\MyEcommerceSiteRadDevReleaseWIP1.json" />
+    <None Include="Templates\MyEcommerceSiteRadDevReleaseWIPTest.json" />
+    <None Include="Templates\MyEcommerceSiteRadDevReleaseWIP.json" />
+    <None Include="Templates\MyEcommerceSiteRadDevRelease.json" />
+    <None Include="Templates\MyEcommerceSiteRadDevRelease.parameters.json" />
+    <None Include="Templates\NestedTemplates\StorageAccount.parameters.json" />
+    <None Include="Templates\NestedTemplates\StorageAccount.json" />
+    <None Include="Templates\ProdAndStage.json" />
+    <None Include="Templates\WebAppManyFeatures.json" />
+    <None Include="Templates\test_azuredeploy.json" />
+    <None Include="Templates\webapp_deploymentslot_azuredeploy.json" />
+  </ItemGroup>
+  <Target Name="GetReferenceAssemblyPaths" />
+  <ProjectExtensions>
+    <VisualStudio>
+      <UserProperties Templates_4NestedTemplates_4WebAppSettings_1json__JSONSchema="" Templates_4NestedTemplates_4ApplicationInsightsWebAppSettings_1json__JSONSchema="http://json.schemastore.org/webjob-publish-settings" />
+    </VisualStudio>
+  </ProjectExtensions>
+</Project>

@@ -1,0 +1,46 @@
+﻿{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+    },
+    "variables": {
+    },
+  "resources": [
+
+    "publicIpConfig",
+    {
+      "assigned": {
+        "id": "[concat('/subscriptions/',subscription().subscriptionId,'/resourceGroups/',toLower(resourceGroup().name),'/providers/Microsoft.Network/publicIPAddresses/',toLower(parameters('name')))]"
+      },
+      "none": {}
+    },
+    "publicIpAddressObject",
+    "[variables('publicIpConfig')[parameters('publicIpAssignment')]]",
+    "vnetID",
+    "[resourceId('Microsoft.Network/virtualNetworks',parameters('virtualNetworkName'))]",
+    "subnetRef",
+    "[concat(variables('vnetID'),'/subnets/', parameters('subnetName'))]",
+    "nicIpConfiguration",
+    {
+      "Static": {
+        "privateIPAllocationMethod": "Static",
+        "privateIPAddress": "[parameters('privateIPAddress')]",
+        "subnet": {
+          "id": "[variables('subnetRef')]"
+        },
+        "publicIPAddress": "[variables('publicIpAddressObject')]"
+      },
+      "Dynamic": {
+        "privateIPAllocationMethod": "Dynamic",
+        "subnet": {
+          "id": "[variables('subnetRef')]"
+        },
+        "publicIPAddress": "[variables('publicIpAddressObject')]"
+      }
+    },
+    "nicIpProperties",
+    "[variables('nicIpConfiguration')[parameters('privateIPAllocationMethod')]]"
+  ],
+    "outputs": {
+    }
+}

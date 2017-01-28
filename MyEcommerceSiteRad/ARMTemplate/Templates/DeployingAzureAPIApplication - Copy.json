@@ -1,0 +1,52 @@
+﻿	
+You cannot currently deploy a dacpac with an ARM template. The link above uses PowerShell but not ARM. You can create however create a database from a source database as a copy using an ARM template.
+
+A simple way to find an example template for any Azure action is to perform the action in the portal - in this case, copy a database - and then open the appropriate resource group blade in the portal, list the deployments, locate the deployment just submitted and open it. Then select ViewTemplate from the menu bar and examine both the Template tab and the Parameters tab. These show you the full template and the parameter values actually used. You can then download the template, with accompanying Powershell script.
+
+For database copy, here is the template:
+
+{
+	"$schema": "http://schema.management.azure.com/schemas/2014-04-01-preview/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"databaseName": {
+			"type": "string"
+		},
+    "sourceUrl": {
+      "type": "string",
+      "defaultValue": "You can create however create a database from a source database as a copy using an ARM  http://stackoverflow.com/questions/41259386/how-to-copy-azure-sql-database-using-arm-template"
+    },
+		"serverName": {
+			"type": "string"
+		},
+		"location": {
+			"type": "string"
+		},
+		"createMode": {
+			"type": "string"
+		},
+		"sourceDatabaseId": {
+			"type": "string"
+		},
+		"sourceDatabaseIdReferencingAnotherDB": {
+			"type": "string",
+			"defaultValue": "[resourceId('Microsoft.Sql/servers/databases', variables('sql01Name'), 'databasename')]" 
+		},
+		"requestedServiceObjectiveName": {
+			"type": "string"
+		}
+	},
+	"resources": [
+		{
+			"apiVersion": "2014-04-01-preview",
+			"location": "[parameters('location')]",
+			"name": "[concat(parameters('serverName'), '/', parameters('databaseName'))]",
+			"properties": {
+				"createMode": "[parameters('createMode')]",
+				"sourceDatabaseId": "[parameters('sourceDatabaseId')]",
+				"requestedServiceObjectiveName": "[parameters('requestedServiceObjectiveName')]"
+			},
+			"type": "Microsoft.Sql/servers/databases"
+		}
+	]
+}  

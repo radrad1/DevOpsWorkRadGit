@@ -1,0 +1,39 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+  },
+  "variables": {
+  },
+  "resources": [
+    {
+      "apiVersion": "2015-08-01",
+      "name": "Staging",
+      "type": "slots",
+      "location": "[resourceGroup().location]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Web/Sites', parameters('webSiteName'))]"
+      ],
+      "properties": {},
+      "resources": [
+        {
+          "apiVersion": "2015-08-01",
+          "name": "appsettings",
+          "type": "config",
+          "dependsOn": [
+            "[resourceId('Microsoft.Web/Sites/Slots', parameters('webSiteName'), 'Staging')]"
+          ],
+          "properties": {
+            "slotname": "Staging",
+            "CustomKeys1": "Foo STAGING",
+            "CustomKeys2": "Bar STAGING",
+            "PROJECT": "src\\MultiChannelToDoMine\\MultiChannelToDo.csproj",
+            "clientUrl": "[concat('http://', reference(resourceId('Microsoft.Web/Sites/Slots', parameters('webSiteName'), 'Staging')).hostNames[0])]"
+          }
+        }
+      ]
+    }
+  ],
+  "outputs": {
+  }
+}

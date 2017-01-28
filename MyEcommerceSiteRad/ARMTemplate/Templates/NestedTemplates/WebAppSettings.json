@@ -1,0 +1,94 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "webAppName": {
+      "type": "string",
+      "minLength": 1
+    },
+    "environment": {
+      "type": "string",
+      "minLength": 1
+    },
+    "releaseDefinitionReleaseEnvironment": {
+      "type": "string",
+      "minLength": 1
+    },
+    "sqlServerName": {
+      "type": "string",
+      "minLength": 1
+    },
+    "databaseName": {
+      "type": "string",
+      "minLength": 1
+    },
+    "administratorLogin": {
+      "type": "string",
+      "minLength": 1
+    },
+    "administratorLoginPassword": {
+      "type": "securestring",
+      "minLength": 1
+    },
+    "webAppSettingsUse32BitWorkerProcess": {
+      "type": "bool",
+      "defaultValue": true
+    },
+    "webAppSettingsAlwaysOn": {
+      "type": "bool",
+      "defaultValue": false
+    },
+    "webAppSettingsRemoteDebuggingEnabled": {
+      "type": "bool",
+      "defaultValue": false
+    },
+    "ApplicationInsightsInstrumentationKey": {
+      "type": "string",
+      "defaultValue": ""
+    }
+  },
+  "variables": {
+    "appInsightsName": "[parameters('webAppName')]"
+  },
+  "resources": [
+    {
+      "apiVersion": "2015-08-01",
+      "name": "[concat(parameters('webAppName'), '/', 'web')]",
+      "type": "Microsoft.Web/sites/config",
+      "dependsOn": [],
+      "properties": {
+        "phpVersion": "",
+        "use32BitWorkerProcess": "[parameters('webAppSettingsUse32BitWorkerProcess')]",
+        "webSocketsEnabled": true,
+        "alwaysOn": "[parameters('webAppSettingsAlwaysOn')]",
+        "remoteDebuggingEnabled": "[parameters('webAppSettingsRemoteDebuggingEnabled')]",
+        "remoteDebuggingVersion": "VS2015"
+      }
+    },
+    {
+      "apiVersion": "2015-08-01",
+      "name": "[concat(parameters('webAppName'), '/', 'connectionstrings')]",
+      "type": "Microsoft.Web/sites/config",
+      "dependsOn": [],
+      "properties": {
+        "DefaultConnection": {
+          "value": "[concat('Data Source=tcp:', reference(concat('Microsoft.Sql/servers/', parameters('sqlServerName')), '2014-04-01-preview').fullyQualifiedDomainName, ',1433;Initial Catalog=', parameters('databaseName'), ';User Id=', parameters('administratorLogin'), '@', parameters('sqlServerName'), ';Password=', parameters('administratorLoginPassword'), ';')]",
+          "type": "SQLServer"
+        }
+      }
+    },
+    {
+      "apiVersion": "2015-08-01",
+      "name": "[concat(parameters('webAppName'), '/', 'appsettings')]",
+      "type": "Microsoft.Web/sites/config",
+      "dependsOn": [],
+      "properties": {
+        "ApplicationInsights:InstrumentationKey": "parameters('ApplicationInsightsInstrumentationKey')",
+        "slotname": "Production",
+        "environment": "[parameters('environment')]",
+        "releaseDefinitionReleaseEnvironment": "[parameters('releaseDefinitionReleaseEnvironment')]"
+      }
+    }
+  ],
+  "outputs": {}
+}
