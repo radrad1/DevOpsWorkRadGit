@@ -272,30 +272,6 @@
   },
   "resources": [
     {
-      "name": "SqlDatabaseDeploymentTemplate",
-      "type": "Microsoft.Resources/deployments",
-      "apiVersion": "2016-09-01",
-      "dependsOn": [],
-      "properties": {
-        "mode": "Incremental",
-        "templateLink": {
-          "uri": "[variables('sqlDatabaseTemplate')]",
-          "contentVersion": "1.0.0.0"
-        },
-        "parameters": {
-          "sqlServerName": { "value": "[variables('sqlServerName')]" },
-          "databaseName": { "value": "[parameters('sqlServerDatabaseName')]" },
-          "administratorLogin": { "value": "[parameters('sqlServerAdministratorLogin')]" },
-          "administratorLoginPassword": { "value": "[parameters('sqlServerAdministratorLoginPassword')]" },
-          "edition": { "value": "[parameters('sqlServerEdition')]" },
-          "collation": { "value": "[parameters('sqlServerCollation')]" },
-          "maxSizeBytes": { "value": "[parameters('sqlServerMaxSizeBytes')]" },
-          "requestedServiceObjectiveName": { "value": "[parameters('sqlServerRequestedServiceObjectiveName')]" }
-        },
-        "debugSetting": { "detailLevel": "requestContent, responseContent" }
-      }
-    },
-    {
       "name": "AppServicePlanDeploymentTemplate",
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2016-09-01",
@@ -394,36 +370,7 @@
         "debugSetting": { "detailLevel": "requestContent, responseContent" }
       }
     },
-    {
-      "name": "WebAppSettingsDeploymentTemplate",
-      "type": "Microsoft.Resources/deployments",
-      "apiVersion": "2016-09-01",
-      "dependsOn": [
-        "[concat('Microsoft.Resources/deployments/', 'WebAppDeploymentTemplate')]",
-        "[concat('Microsoft.Resources/deployments/', 'SqlDatabaseDeploymentTemplate')]",
-        "[concat('Microsoft.Resources/deployments/', 'ApplicationInsightsWebAppSettingTemplate')]"
-      ],
-      "properties": {
-        "mode": "Incremental",
-        "templateLink": {
-          "uri": "[variables('webAppSettingsTemplate')]",
-          "contentVersion": "1.0.0.0"
-        },
-        "parameters": {
-          "webAppName": { "value": "[parameters('webAppName')]" },
-          "environment": { "value": "[parameters('environment')]" },
-          "releaseDefinitionReleaseEnvironment": { "value": "[parameters('releaseDefinitionReleaseEnvironment')]" },
-          "sqlServerName": { "value": "[variables('sqlServerName')]" },
-          "databaseName": { "value": "[parameters('sqlServerDatabaseName')]" },
-          "administratorLogin": { "value": "[parameters('sqlServerAdministratorLogin')]" },
-          "administratorLoginPassword": { "value": "[parameters('sqlServerAdministratorLoginPassword')]" },
-          "webAppSettingsRemoteDebuggingEnabled": { "value": "[variables('webAppSettingsRemoteDebuggingEnabled')]" },
-          "ApplicationInsightsInstrumentationKey": { "value": "[reference('ApplicationInsightsWebAppSettingTemplate').outputs.ApplicationInsightsInstrumentationKey.value]" }
-        },
-        "debugSetting": { "detailLevel": "requestContent, responseContent" }
-      }
-    },
-    {
+     {
       "name": "WebAppSlotDeploymentTemplate",
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2016-09-01",
@@ -443,38 +390,6 @@
           "slotName": { "value": "[parameters('webAppSlotName')]" },
           "appSettingNames": { "value": "[parameters('webAppSlotConfigNamesAppSettingNames')]" },
           "connectionStringNames": { "value": "[parameters('webAppSlotConfigNamesConnectionStringNames')]" }
-        },
-        "debugSetting": { "detailLevel": "requestContent, responseContent" }
-      }
-    },
-    {
-      "name": "WebAppSlotSettingsDeploymentTemplate",
-      "type": "Microsoft.Resources/deployments",
-      "apiVersion": "2016-09-01",
-      "dependsOn": [
-        "[concat('Microsoft.Resources/deployments/', 'WebAppSlotDeploymentTemplate')]",
-        "[concat('Microsoft.Resources/deployments/', 'SqlDatabaseDeploymentTemplate')]",
-        "[concat('Microsoft.Resources/deployments/', 'ApplicationInsightsWebAppSlotSettingTemplate')]"
-      ],
-      "properties": {
-        "mode": "Incremental",
-        "templateLink": {
-          "uri": "[variables('webAppSlotSettingsTemplate')]",
-          "contentVersion": "1.0.0.0"
-        },
-        "parameters": {
-          "webAppName": { "value": "[parameters('webAppName')]" },
-          "slotName": { "value": "[parameters('webAppSlotName')]" },
-          "environment": { "value": "[parameters('environment')]" },
-          "releaseDefinitionReleaseEnvironment": { "value": "[parameters('releaseDefinitionReleaseEnvironment')]" },
-          "sqlServerName": { "value": "[variables('sqlServerName')]" },
-          "databaseName": { "value": "[parameters('sqlServerDatabaseName')]" },
-          "administratorLogin": { "value": "[parameters('sqlServerAdministratorLogin')]" },
-          "administratorLoginPassword": { "value": "[parameters('sqlServerAdministratorLoginPassword')]" },
-          "webAppSettingsUse32BitWorkerProcess": { "value": "[variables('webAppSettingsUse32BitWorkerProcessSwitch')[variables('appServicePlanSkuNameLowerCase')]]" },
-          "webAppSettingsAlwaysOn": { "value": "[variables('webAppSettingsAlwaysOnSwitch')[variables('appServicePlanSkuNameLowerCase')]]" },
-          "webAppSettingsRemoteDebuggingEnabled": { "value": "[variables('webAppSettingsRemoteDebuggingEnabled')]" },
-          "ApplicationInsightsInstrumentationKey": { "value": "[reference('ApplicationInsightsWebAppSlotSettingTemplate').outputs.ApplicationInsightsInstrumentationKey.value]" }
         },
         "debugSetting": { "detailLevel": "requestContent, responseContent" }
       }
