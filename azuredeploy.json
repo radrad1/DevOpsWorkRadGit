@@ -375,7 +375,6 @@
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2016-09-01",
       "dependsOn": [
-        "[concat('Microsoft.Resources/deployments/', 'AppServicePlanDeploymentTemplate')]",
         "[concat('Microsoft.Resources/deployments/', 'WebAppDeploymentTemplate')]"
       ],
       "properties": {
